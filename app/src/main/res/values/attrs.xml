@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PushBoxLayout">
+        <attr name="bottomDrawable" format="reference"/>
+        <attr name="level" format="integer"/>
+    </declare-styleable>
+</resources>
