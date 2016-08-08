@@ -98,6 +98,7 @@ public final class PushBoxLayout extends ViewGroup {
 
     private void startGame(@Nullable PushboxSavedState savedInstance) {
         mDragHelper = null;
+        removeCallbacks(startSenceAnimRunnable);
         if (savedInstance != null) {
             this.setLevel(savedInstance.N);
             this.setResId(savedInstance.resId);
@@ -112,48 +113,50 @@ public final class PushBoxLayout extends ViewGroup {
 
         if (savedInstance == null) {
             noShuffle();
-            postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    AutoTransition autoTransition = new AutoTransition();
-                    autoTransition.addListener(new Transition.TransitionListener() {
-                        @Override
-                        public void onTransitionStart(Transition transition) {
-
-                        }
-
-                        @Override
-                        public void onTransitionEnd(Transition transition) {
-                            initDragHelper();
-                        }
-
-                        @Override
-                        public void onTransitionCancel(Transition transition) {
-
-                        }
-
-                        @Override
-                        public void onTransitionPause(Transition transition) {
-
-                        }
-
-                        @Override
-                        public void onTransitionResume(Transition transition) {
-
-                        }
-                    });
-                    TransitionManager.beginDelayedTransition(PushBoxLayout.this, autoTransition);//重要，会记录当前帧和下一帧的改变，创建动画效果
-                    shuffle();
-                    targetView.setVisibility(View.INVISIBLE);
-                    requestLayout();
-                }
-            }, 1000);
+            postDelayed(startSenceAnimRunnable, 1000);
         } else {
             targetView.setVisibility(View.INVISIBLE);
             initDragHelper();
         }
 
     }
+
+    private Runnable startSenceAnimRunnable = new Runnable() {
+        @Override
+        public void run() {
+            AutoTransition autoTransition = new AutoTransition();
+            autoTransition.addListener(new Transition.TransitionListener() {
+                @Override
+                public void onTransitionStart(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionEnd(Transition transition) {
+                    initDragHelper();
+                }
+
+                @Override
+                public void onTransitionCancel(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionPause(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionResume(Transition transition) {
+
+                }
+            });
+            TransitionManager.beginDelayedTransition(PushBoxLayout.this, autoTransition);//重要，会记录当前帧和下一帧的改变，创建动画效果
+            shuffle();
+            targetView.setVisibility(View.INVISIBLE);
+            requestLayout();
+        }
+    };
 
     @Override
     protected Parcelable onSaveInstanceState() {
