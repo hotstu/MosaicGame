@@ -11,6 +11,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
+import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -72,7 +73,6 @@ public final class PushBoxLayout extends ViewGroup {
         a.recycle();
         setLevel(level);
         setResId(resId);
-        startGame();
     }
 
     public PushBoxLayout setLevel(int level) {
@@ -108,10 +108,22 @@ public final class PushBoxLayout extends ViewGroup {
         prepareGame();
 
         if (savedInstance == null) {
-            shuffle();
+            noShuffle();
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    TransitionManager.beginDelayedTransition(PushBoxLayout.this);//重要，会记录当前帧和下一帧的改变，创建动画效果
+                    shuffle();
+                    targetView.setVisibility(View.INVISIBLE);
+                    requestLayout();
+                    initDragHelper();
+                }
+            }, 1000);
+        } else {
+            targetView.setVisibility(View.INVISIBLE);
+            initDragHelper();
         }
 
-        initDragHelper();
     }
 
     @Override
@@ -156,8 +168,14 @@ public final class PushBoxLayout extends ViewGroup {
             }
         }
         targetView = getChildAt(maximumBlock - 1);
-        targetView.setVisibility(View.INVISIBLE);
 
+    }
+
+    private void noShuffle() {
+        for (int i = 0; i < maximumBlock; i++) {
+            id2position[i] = i;
+            position2id[i] = i;
+        }
     }
 
     private void shuffle() {
@@ -284,6 +302,7 @@ public final class PushBoxLayout extends ViewGroup {
                     int i = 0;
                     for (; i < maximumBlock && (id2position[i] == i); i++) {}
                     if (i >= maximumBlock) {
+                        //TransitionManager.beginDelayedTransition(PushBoxLayout.this);//重要，会记录当前帧和下一帧的改变，创建动画效果
                         targetView.setVisibility(View.VISIBLE);
                         mDragHelper = null;
                     }

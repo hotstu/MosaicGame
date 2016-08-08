@@ -12,6 +12,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mBoxLayout = (PushBoxLayout) findViewById(R.id.box);
+        if (savedInstanceState == null)
+            mBoxLayout.startGame();// dont call it when activity recreated by android, PushBoxLayout handle it automaticlly
     }
 
     public void btn1(View view) {

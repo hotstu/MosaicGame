@@ -6,4 +6,4 @@ a game based on custom viewgroup
 `mBoxLayout.setLevel(4).setResId(R.drawable.doraemon).startGame();`
 
 
-![sample1](/art/Screenshot_20160724-121054.png)
+![sample1](/art/4.gif)
