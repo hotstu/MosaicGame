@@ -11,6 +11,8 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
+import android.transition.AutoTransition;
+import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -95,6 +97,7 @@ public final class PushBoxLayout extends ViewGroup {
     }
 
     private void startGame(@Nullable PushboxSavedState savedInstance) {
+        mDragHelper = null;
         if (savedInstance != null) {
             this.setLevel(savedInstance.N);
             this.setResId(savedInstance.resId);
@@ -112,11 +115,37 @@ public final class PushBoxLayout extends ViewGroup {
             postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    TransitionManager.beginDelayedTransition(PushBoxLayout.this);//重要，会记录当前帧和下一帧的改变，创建动画效果
+                    AutoTransition autoTransition = new AutoTransition();
+                    autoTransition.addListener(new Transition.TransitionListener() {
+                        @Override
+                        public void onTransitionStart(Transition transition) {
+
+                        }
+
+                        @Override
+                        public void onTransitionEnd(Transition transition) {
+                            initDragHelper();
+                        }
+
+                        @Override
+                        public void onTransitionCancel(Transition transition) {
+
+                        }
+
+                        @Override
+                        public void onTransitionPause(Transition transition) {
+
+                        }
+
+                        @Override
+                        public void onTransitionResume(Transition transition) {
+
+                        }
+                    });
+                    TransitionManager.beginDelayedTransition(PushBoxLayout.this, autoTransition);//重要，会记录当前帧和下一帧的改变，创建动画效果
                     shuffle();
                     targetView.setVisibility(View.INVISIBLE);
                     requestLayout();
-                    initDragHelper();
                 }
             }, 1000);
         } else {
@@ -230,7 +259,7 @@ public final class PushBoxLayout extends ViewGroup {
                 Log.d(TAG, "try capture childId:" + child.getId());
                 if (currentState != ViewDragHelper.STATE_IDLE)
                     return false;
-                if (child.getId() < 0 || child.getId() > maximumBlock) // not a valid child
+                if (child.getId() < 0 || child.getId() >= maximumBlock) // not a valid child
                     return false;
                 if (child.getId() == maximumBlock - 1) //is the invisiable block
                     return false;
